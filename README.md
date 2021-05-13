@@ -1,1 +1,18 @@
-hey 2
+# BMP Surface Fetcher
+
+This is a simple, two file library for Emscripten + SDL2, which allows you to fetch a BMP file directly to a SDL_Surface object.
+
+## Usage
+
+Look into the [example.c] file for an usage example.
+
+[example.c]: https://github.com/plabuda/bmp_surface_fetcher/blob/development/hello_sdl_loop.c
+
+TL;DR:
+1. Initialize a fetcher
+2. call bmpsf_fetch with a desired filename
+3. When polling SDL Events, look out for an event with your freshly-fetched SDL_Surface
+
+## LICENSE
+
+MIT or Public Domain, whichever suits you best. Credit is appreciated, but not needed. If you find the lib useful, tell me about it, I'd be happy to hear that. 
