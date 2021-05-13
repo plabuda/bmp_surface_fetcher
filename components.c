@@ -1,0 +1,11 @@
+#define COMPONENT_IMPL
+#include "acceleration.h"
+#include "bike.h"
+#include "box_collider.h"
+#include "camera.h"
+#include "checkpoint.h"
+#include "force.h"
+#include "position.h"
+#include "renderable.h"
+#include "stick.h"
+#include "wheel.h"

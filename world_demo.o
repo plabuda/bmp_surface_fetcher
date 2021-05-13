@@ -1,0 +1,3 @@
+world_demo.o: world_demo.c world_demo.h globals.h bike.h flecs.h verlet.h \
+  dot.h vector2D.h position.h stick.h game_state_machine.h renderable.h \
+  scoreboard.h world.h box_collider.h
