@@ -3,13 +3,6 @@
 typedef enum {
 
   Loading,
-  Menu,
-  Playing_waiting,
-  Playing,
-  Playing_finished,
-  Scores,
-  Credits,
-
   Simulation,
 
   Last // Marker for enum width
