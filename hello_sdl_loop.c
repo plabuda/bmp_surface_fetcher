@@ -7,7 +7,7 @@ SDL_Renderer *renderer;
 SDL_Surface *surface;
 SDL_Texture *texture;
 
-BmpSurfaceFetcher *ctx;
+BmpSurfaceFetcher *fetcher;
 
 void quit()
 {
@@ -24,16 +24,16 @@ void process_events()
     {
         // Surface safely returns NULL when event is of a wrong type
         // so bmpsf_get_surface can be used as a test for event.type
-        if (bmpsf_get_surface(ctx, &event))
+        if (bmpsf_get_surface(fetcher, &event))
         {
             printf("BMP Surface fetched called\n");
             // bmpsf_get_filename returns the same const char pointer
             // that was passed into bmpsf_fetch, so if you want
             // to detect between multiple textures, pointer comparison
             // is sufficient
-            printf("Filename is: %s\n", bmpsf_get_filename(ctx, &event));
+            printf("Filename is: %s\n", bmpsf_get_filename(fetcher, &event));
 
-            surface = bmpsf_get_surface(ctx, &event);
+            surface = bmpsf_get_surface(fetcher, &event);
 
             // For this example, convert the surface to a texture
             texture = SDL_CreateTextureFromSurface(renderer, surface);
@@ -79,13 +79,13 @@ int main()
         -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);             //
 
     // Initialize BMP Fetcher. This will register an ID for a custom SDL event
-    ctx = bmpsf_init();
+    fetcher = bmpsf_init();
 
     const char *filename = "texture.bmp";
     // Fetch a BMP file
     // Fetching happens on a separate thread, using emscripten_async_wget_data
     // When BMP is ready, an SDL_Event will be pushed onto queue, containing the surface
-    bmpsf_fetch(ctx, filename);
+    bmpsf_fetch(fetcher, filename);
 
     emscripten_set_main_loop(frame, 60, 0);
 }
