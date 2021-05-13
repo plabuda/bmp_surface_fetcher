@@ -3,14 +3,15 @@
 
 typedef struct {
   Uint32 event_id;
-} SurfaceFetcherContext;
+} BmpSurfaceFetcher;
 
-SurfaceFetcherContext *init_surface_fetcher();
-void fetch_surface_bmp(const SurfaceFetcherContext *context,
-                       const char *filename);
-SDL_Surface *get_surface_bmp(const SurfaceFetcherContext *context,
-                             const SDL_Event *e);
-const char *get_surface_filename(const SurfaceFetcherContext *context,
-                                 const SDL_Event *e);
+BmpSurfaceFetcher *bmpsf_init();
 
-void clear_surface_event(const SDL_Event *e);
+void bmpsf_fetch(const BmpSurfaceFetcher *context, const char *filename);
+
+SDL_Surface *bmpsf_get_surface(const BmpSurfaceFetcher *context,
+                               const SDL_Event *e);
+const char *bmpsf_get_filename(const BmpSurfaceFetcher *context,
+                               const SDL_Event *e);
+
+void bmpsf_clear_event(const SDL_Event *e);

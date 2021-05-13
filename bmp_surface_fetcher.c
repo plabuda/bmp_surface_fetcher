@@ -2,21 +2,21 @@
 #include "emscripten.h"
 #include <SDL2/SDL.h>
 
-SurfaceFetcherContext *init_surface_fetcher()
+BmpSurfaceFetcher *bmpsf_init()
 {
-    SurfaceFetcherContext *ctx = malloc(sizeof(SurfaceFetcherContext));
+    BmpSurfaceFetcher *ctx = malloc(sizeof(BmpSurfaceFetcher));
     ctx->event_id = SDL_RegisterEvents(1);
     return ctx;
 }
 
 typedef struct
 {
-    const SurfaceFetcherContext *ctx;
+    const BmpSurfaceFetcher *ctx;
     const char *filename;
     SDL_Surface *surface;
-} fetch_args;
+} bmpsf_fetch_args;
 
-static void push_surface_load_event(fetch_args *arguments)
+static void push_surface_load_event(bmpsf_fetch_args *arguments)
 {
     SDL_Event load_event;
     SDL_zero(load_event);
@@ -28,9 +28,9 @@ static void push_surface_load_event(fetch_args *arguments)
 
 static void on_surface_load(void *arg, void *buffer, int size)
 {
-    fetch_args *arguments = (fetch_args *)arg;
+    bmpsf_fetch_args *arguments = (bmpsf_fetch_args *)arg;
     const char *name = arguments->filename;
-    const SurfaceFetcherContext *ctx = arguments->ctx;
+    const BmpSurfaceFetcher *ctx = arguments->ctx;
 
     SDL_RWops *file = SDL_RWFromConstMem(buffer, size);
     arguments->surface = SDL_LoadBMP_RW(file, 1);
@@ -40,38 +40,36 @@ static void on_surface_load(void *arg, void *buffer, int size)
 
 static void on_data_error(void *arg)
 {
-    const char *name = (const char *)arg;
-    printf("bmp fetching error: %s\n", name);
 }
 
-void fetch_surface_bmp(const SurfaceFetcherContext *context, const char *filename)
+void bmpsf_fetch(const BmpSurfaceFetcher *context, const char *filename)
 {
-    fetch_args *f = malloc(sizeof(fetch_args));
-    *f = (fetch_args){context, filename, NULL};
+    bmpsf_fetch_args *f = malloc(sizeof(bmpsf_fetch_args));
+    *f = (bmpsf_fetch_args){context, filename, NULL};
     emscripten_async_wget_data(filename, f, on_surface_load, on_data_error);
 }
 
-SDL_Surface *get_surface_bmp(const SurfaceFetcherContext *context, const SDL_Event *e)
+SDL_Surface *bmpsf_get_surface(const BmpSurfaceFetcher *context, const SDL_Event *e)
 {
     if (e->type == context->event_id)
     {
-        const fetch_args *args = (const fetch_args *)e->user.data1;
+        const bmpsf_fetch_args *args = (const bmpsf_fetch_args *)e->user.data1;
         return args->surface;
     }
     return NULL;
 }
 
-const char *get_surface_filename(const SurfaceFetcherContext *context, const SDL_Event *e)
+const char *bmpsf_get_filename(const BmpSurfaceFetcher *context, const SDL_Event *e)
 {
     if (e->type == context->event_id)
     {
-        const fetch_args *args = (const fetch_args *)e->user.data1;
+        const bmpsf_fetch_args *args = (const bmpsf_fetch_args *)e->user.data1;
         return args->filename;
     }
     return NULL;
 }
 
-void clear_surface_event(const SDL_Event *e)
+void bmpsf_clear_event(const SDL_Event *e)
 {
     free(e->user.data1);
 }
