@@ -1,16 +1,11 @@
 #include "bmp_surface_fetcher.h"
-#include "data_loader.h"
 #include <SDL2/SDL.h>
 #include <emscripten.h>
 #include <stdio.h>
 
-Uint32 FONT_LOAD;
-
 SDL_Renderer *renderer;
 SDL_Surface *surface;
-SDL_Texture *FontTexture;
-
-const char *filename = "texture.bmp";
+SDL_Texture *texture;
 
 BmpSurfaceFetcher *ctx;
 
@@ -22,24 +17,32 @@ void quit()
 
 void process_events()
 {
-    /* Our SDL event placeholder. */
     SDL_Event event;
 
     /* Grab all the events off the queue. */
     while (SDL_PollEvent(&event))
     {
+        // Surface safely returns NULL when event is of a wrong type
+        // so bmpsf_get_surface can be used as a test for event.type
         if (bmpsf_get_surface(ctx, &event))
         {
-            printf("Surface event called\n");
+            printf("BMP Surface fetched called\n");
+            // bmpsf_get_filename returns the same const char pointer
+            // that was passed into bmpsf_fetch, so if you want
+            // to detect between multiple textures, pointer comparison
+            // is sufficient
             printf("Filename is: %s\n", bmpsf_get_filename(ctx, &event));
+
             surface = bmpsf_get_surface(ctx, &event);
-            FontTexture = SDL_CreateTextureFromSurface(renderer, surface);
+
+            // For this example, convert the surface to a texture
+            texture = SDL_CreateTextureFromSurface(renderer, surface);
+
+            // Important! To avoid casting away const qualifier of the filename
+            // a small structure is allocated for each event
+            // to avoid a memory leak, you need to call bmpsf_clear_event
+            // the event is unusable after that operation
             bmpsf_clear_event(&event);
-        }
-        else if (event.type == FONT_LOAD)
-        {
-            surface = (SDL_Surface *)event.user.data1;
-            FontTexture = SDL_CreateTextureFromSurface(renderer, surface);
         }
         else if (event.type == SDL_QUIT)
         {
@@ -51,32 +54,38 @@ void process_events()
 void frame()
 {
     process_events();
-    if (FontTexture != NULL)
+
+    // Simply copy the texture to the top left corner of the window
+    if (texture != NULL)
     {
         SDL_RenderClear(renderer);
+
         SDL_Rect rect;
         SDL_zero(rect);
+        SDL_QueryTexture(texture, NULL, NULL, &(rect.w), &(rect.h));
+        SDL_RenderCopy(renderer, texture, NULL, &rect);
 
-        SDL_QueryTexture(FontTexture, NULL, NULL, &(rect.w), &(rect.h));
-        SDL_SetRenderTarget(renderer, NULL);
-        SDL_RenderCopy(renderer, FontTexture, NULL, &rect);
         SDL_RenderPresent(renderer);
     }
 }
 
 int main()
 {
+    // Initialize a simple window and obtain the renderer
     SDL_Init(SDL_INIT_VIDEO);
-    SDL_Window *w =
-        SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, SDL_WINDOW_SHOWN);
-    renderer = SDL_CreateRenderer(w, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    renderer = SDL_CreateRenderer(                                             //
+        SDL_CreateWindow("BMP Fetcher Example", SDL_WINDOWPOS_UNDEFINED,       //
+                         SDL_WINDOWPOS_UNDEFINED, 512, 512, SDL_WINDOW_SHOWN), //
+        -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);             //
 
-    FONT_LOAD = SDL_RegisterEvents(1);
-
+    // Initialize BMP Fetcher. This will register an ID for a custom SDL event
     ctx = bmpsf_init();
 
+    const char *filename = "texture.bmp";
+    // Fetch a BMP file
+    // Fetching happens on a separate thread, using emscripten_async_wget_data
+    // When BMP is ready, an SDL_Event will be pushed onto queue, containing the surface
     bmpsf_fetch(ctx, filename);
 
-    //  load_font("CodePage437Font.bmp");
     emscripten_set_main_loop(frame, 60, 0);
 }
