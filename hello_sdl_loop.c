@@ -1,6 +1,5 @@
 #include "data_loader.h"
 #include "font_printer.h"
-#include "game_state_machine.h"
 #include "globals.h"
 #include "palette.h"
 #include <SDL2/SDL.h>
@@ -45,11 +44,25 @@ void process_events()
     }
 }
 
+void state_simulation_frame()
+{
+    SDL_Rect rect;
+    SDL_zero(rect);
+
+    SDL_QueryTexture(G.FontTexture, NULL, NULL, &(rect.w), &(rect.h));
+    SDL_SetRenderTarget(G.renderer, NULL);
+    SDL_RenderCopy(G.renderer, G.FontTexture, NULL, &rect);
+}
+
 void frame()
 {
+    process_events();
     palette_set_color(Sand);
     SDL_RenderClear(G.renderer);
-    gsm_frame(&G.gsm);
+    if (G.FontTexture != NULL)
+    {
+        state_simulation_frame();
+    }
     SDL_RenderPresent(G.renderer);
 }
 
@@ -58,7 +71,6 @@ void frame()
  */
 void loop_fn()
 {
-    process_events();
     const int nominator = 60;
     const int denominator = 1000;
     static int accumulated_ticks = 0;
@@ -85,9 +97,6 @@ int main()
         SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, SDL_WINDOW_SHOWN);
     G.renderer = SDL_CreateRenderer(w, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     G.FONT_LOAD = SDL_RegisterEvents(1);
-
-    G.gsm = gsm_new();
-    // Temporary change
-    gsm_set_state(&(G.gsm), Loading);
-    emscripten_set_main_loop(loop_fn, 60, 0);
+    load_font("CodePage437Font.bmp");
+    emscripten_set_main_loop(frame, 60, 0);
 }
