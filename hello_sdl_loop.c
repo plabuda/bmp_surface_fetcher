@@ -6,6 +6,8 @@
 
 Globals G;
 
+SDL_Texture *FontTexture = NULL;
+
 void quit()
 {
     emscripten_cancel_main_loop();
@@ -23,12 +25,12 @@ void process_events()
         if (event.type == G.FONT_LOAD)
         {
             printf("Font load event\n");
-            if (G.FontTexture != NULL)
+            if (FontTexture != NULL)
             {
-                SDL_DestroyTexture(G.FontTexture);
+                SDL_DestroyTexture(FontTexture);
             }
 
-            G.FontTexture = event.user.data2;
+            FontTexture = event.user.data2;
         }
         else if (event.type == SDL_QUIT)
         {
@@ -42,16 +44,16 @@ void state_simulation_frame()
     SDL_Rect rect;
     SDL_zero(rect);
 
-    SDL_QueryTexture(G.FontTexture, NULL, NULL, &(rect.w), &(rect.h));
+    SDL_QueryTexture(FontTexture, NULL, NULL, &(rect.w), &(rect.h));
     SDL_SetRenderTarget(G.renderer, NULL);
-    SDL_RenderCopy(G.renderer, G.FontTexture, NULL, &rect);
+    SDL_RenderCopy(G.renderer, FontTexture, NULL, &rect);
 }
 
 void frame()
 {
     process_events();
     SDL_RenderClear(G.renderer);
-    if (G.FontTexture != NULL)
+    if (FontTexture != NULL)
     {
         state_simulation_frame();
     }
