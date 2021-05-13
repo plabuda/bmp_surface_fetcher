@@ -1,7 +1,5 @@
 #include "data_loader.h"
-#include "font_printer.h"
 #include "globals.h"
-#include "palette.h"
 #include <SDL2/SDL.h>
 #include <emscripten.h>
 #include <stdio.h>
@@ -31,11 +29,6 @@ void process_events()
             }
 
             G.FontTexture = event.user.data2;
-            SDL_SetTextureColorMod(G.FontTexture,             //
-                                   palette_get_r(Water_Dark), //
-                                   palette_get_g(Water_Dark), //
-                                   palette_get_b(Water_Dark));
-            font_init();
         }
         else if (event.type == SDL_QUIT)
         {
@@ -57,36 +50,12 @@ void state_simulation_frame()
 void frame()
 {
     process_events();
-    palette_set_color(Sand);
     SDL_RenderClear(G.renderer);
     if (G.FontTexture != NULL)
     {
         state_simulation_frame();
     }
     SDL_RenderPresent(G.renderer);
-}
-
-/**
- * The loop handler, will be called repeatedly
- */
-void loop_fn()
-{
-    const int nominator = 60;
-    const int denominator = 1000;
-    static int accumulated_ticks = 0;
-    static int old_ticks = 0;
-    static int new_ticks = 0;
-
-    new_ticks = SDL_GetTicks();
-
-    accumulated_ticks += (new_ticks - old_ticks) * nominator;
-    old_ticks = new_ticks;
-
-    if (accumulated_ticks > denominator)
-    {
-        frame();
-        accumulated_ticks -= denominator;
-    }
 }
 
 int main()
