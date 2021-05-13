@@ -1,0 +1,8 @@
+{
+  "name": "bmp_surface_fetcher",
+  "version": "1.0.0",
+  "repo": "plabuda/bmp_surface_fetcher",
+  "description": "Fetch a BMP file directly to a SDL_Surface ",
+  "license": "MIT",
+  "src": ["bmp_surface_fetcher.c", "bmp_surface_fetcher.h"]
+}

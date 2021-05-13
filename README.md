@@ -6,7 +6,13 @@ This is a simple, two file library for Emscripten + SDL2, which allows you to fe
 
 Look into the [example.c] file for an usage example.
 
-[example.c]: https://github.com/plabuda/bmp_surface_fetcher/blob/development/hello_sdl_loop.c
+[example.c]: https://github.com/plabuda/bmp_surface_fetcher/example.c
+
+To include the library in your project, add the .c and .h files.
+
+You can also get those files with [clib] package manager
+
+[clib]: https://github.com/clibs/clib
 
 TL;DR:
 1. Initialize a fetcher
@@ -16,3 +22,9 @@ TL;DR:
 ## LICENSE
 
 MIT or Public Domain, whichever suits you best. Credit is appreciated, but not needed. If you find the lib useful, tell me about it, I'd be happy to hear that. 
+
+## Attribution
+
+[texture.bmp] used as an example comes from https://cc0textures.com/view?id=Bricks058, licensed under CC0
+
+[texture.bmp]: https://github.com/plabuda/bmp_surface_fetcher/texture.bmp
