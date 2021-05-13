@@ -1,10 +1,5 @@
 #pragma once
-#include "bike.h"
 #include "game_state_machine.h"
-#include "renderable.h"
-#include "scoreboard.h"
-#include "verlet.h"
-#include "world.h"
 #include <SDL2/SDL.h>
 
 enum { globals_key_count = 5 };
@@ -28,7 +23,5 @@ typedef struct Globals {
   Uint32 LEVEL_LOAD;
   Uint32 FONT_LOAD;
   Uint32 AUDIO_LOAD;
-  World *w;
   GameStateMachine gsm;
-  Scoreboard *s;
 } Globals;

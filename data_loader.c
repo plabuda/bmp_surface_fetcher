@@ -8,16 +8,16 @@
 
 extern Globals G;
 
-void push_level_load_event(char *name, World *w)
-{
-    SDL_Event load_event;
-    SDL_zero(load_event);
-    load_event.type = G.LEVEL_LOAD;
-    load_event.user.code = 0;
-    load_event.user.data1 = name;
-    load_event.user.data2 = w;
-    SDL_PushEvent(&load_event);
-}
+// void push_level_load_event(char *name, World *w)
+// {
+//     SDL_Event load_event;
+//     SDL_zero(load_event);
+//     load_event.type = G.LEVEL_LOAD;
+//     load_event.user.code = 0;
+//     load_event.user.data1 = name;
+//     load_event.user.data2 = w;
+//     SDL_PushEvent(&load_event);
+// }
 
 void push_font_load_event(char *name, SDL_Texture *t)
 {
@@ -41,15 +41,15 @@ void push_audio_load_event(char *name, void *buf, unsigned size)
     SDL_PushEvent(&audio_event);
 }
 
-void on_level_load(void *arg, void *buffer, int size)
-{
-    printf("level received\n");
-    char *name = (char *)arg;
-    int floatsize = (size % sizeof(float) == 0) ? (size / sizeof(float)) : (size / sizeof(float) + 1);
-    floatsize *= sizeof(float);
-    World *w = world_from_floats(buffer);
-    push_level_load_event(name, w);
-}
+// void on_level_load(void *arg, void *buffer, int size)
+// {
+//     printf("level received\n");
+//     char *name = (char *)arg;
+//     int floatsize = (size % sizeof(float) == 0) ? (size / sizeof(float)) : (size / sizeof(float) + 1);
+//     floatsize *= sizeof(float);
+//     World *w = world_from_floats(buffer);
+//     push_level_load_event(name, w);
+// }
 
 void on_font_load(void *arg, void *buffer, int size)
 {
@@ -76,7 +76,7 @@ void on_data_error(void *arg)
 
 void load_data(char *name)
 {
-    emscripten_async_wget_data(name, name, on_level_load, on_data_error);
+    // emscripten_async_wget_data(name, name, on_level_load, on_data_error);
 }
 
 void load_font(char *name)
