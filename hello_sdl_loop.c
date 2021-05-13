@@ -1,12 +1,13 @@
 #include "data_loader.h"
-#include "globals.h"
 #include <SDL2/SDL.h>
 #include <emscripten.h>
 #include <stdio.h>
 
-Globals G;
+Uint32 FONT_LOAD;
 
-SDL_Texture *FontTexture = NULL;
+SDL_Renderer *renderer;
+SDL_Surface *surface;
+SDL_Texture *FontTexture;
 
 void quit()
 {
@@ -22,15 +23,10 @@ void process_events()
     /* Grab all the events off the queue. */
     while (SDL_PollEvent(&event))
     {
-        if (event.type == G.FONT_LOAD)
+        if (event.type == FONT_LOAD)
         {
-            printf("Font load event\n");
-            if (FontTexture != NULL)
-            {
-                SDL_DestroyTexture(FontTexture);
-            }
-
-            FontTexture = event.user.data2;
+            surface = (SDL_Surface *)event.user.data1;
+            FontTexture = SDL_CreateTextureFromSurface(renderer, surface);
         }
         else if (event.type == SDL_QUIT)
         {
@@ -39,35 +35,29 @@ void process_events()
     }
 }
 
-void state_simulation_frame()
-{
-    SDL_Rect rect;
-    SDL_zero(rect);
-
-    SDL_QueryTexture(FontTexture, NULL, NULL, &(rect.w), &(rect.h));
-    SDL_SetRenderTarget(G.renderer, NULL);
-    SDL_RenderCopy(G.renderer, FontTexture, NULL, &rect);
-}
-
 void frame()
 {
     process_events();
-    SDL_RenderClear(G.renderer);
     if (FontTexture != NULL)
     {
-        state_simulation_frame();
+        SDL_RenderClear(renderer);
+        SDL_Rect rect;
+        SDL_zero(rect);
+
+        SDL_QueryTexture(FontTexture, NULL, NULL, &(rect.w), &(rect.h));
+        SDL_SetRenderTarget(renderer, NULL);
+        SDL_RenderCopy(renderer, FontTexture, NULL, &rect);
+        SDL_RenderPresent(renderer);
     }
-    SDL_RenderPresent(G.renderer);
 }
 
 int main()
 {
     SDL_Init(SDL_INIT_VIDEO);
-    SDL_zero(G);
     SDL_Window *w =
         SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, SDL_WINDOW_SHOWN);
-    G.renderer = SDL_CreateRenderer(w, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    G.FONT_LOAD = SDL_RegisterEvents(1);
+    renderer = SDL_CreateRenderer(w, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    FONT_LOAD = SDL_RegisterEvents(1);
     load_font("CodePage437Font.bmp");
     emscripten_set_main_loop(frame, 60, 0);
 }
