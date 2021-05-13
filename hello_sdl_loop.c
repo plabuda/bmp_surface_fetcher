@@ -38,27 +38,6 @@ void process_events()
                                    palette_get_b(Water_Dark));
             font_init();
         }
-        else if (event.type == G.AUDIO_LOAD)
-        {
-            // printf("Audio load event: %s\n", (char *)event.user.data1);
-            // switch (((char *)event.user.data1)[0])
-            // {
-
-            // case 'm':
-            //     audio_init_background_music(event.user.data2, event.user.code);
-            //     break;
-
-            // case 'c':
-            //     audio_init_crash(event.user.data2, event.user.code);
-            //     break;
-
-            // case 'b':
-            //     audio_init_beep(event.user.data2, event.user.code);
-            //     break;
-            // }
-
-            // audio_start_playback();
-        }
         else if (event.type == SDL_QUIT)
         {
             quit();
@@ -70,27 +49,7 @@ void frame()
 {
     palette_set_color(Sand);
     SDL_RenderClear(G.renderer);
-
     gsm_frame(&G.gsm);
-
-    int w, h;
-    int midx, midy;
-    SDL_QueryTexture(G.t, NULL, NULL, &w, &h);
-
-    midx = w / 2;
-    midy = h / 2;
-
-    SDL_Rect r;
-
-    for (int i = 400; i > 380; i--)
-    {
-        r.w = (w * i) / 400;
-        r.h = (h * i) / 400;
-        r.x = midx - r.w / 2;
-        r.y = midy - r.h / 2;
-
-        SDL_RenderCopy(G.renderer, G.t, &r, NULL);
-    }
     SDL_RenderPresent(G.renderer);
 }
 
@@ -125,29 +84,8 @@ int main()
     SDL_Window *w =
         SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, SDL_WINDOW_SHOWN);
     G.renderer = SDL_CreateRenderer(w, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    Uint32 format = SDL_GetWindowPixelFormat(w);
-    printf("Format is: %u, RGBA is %u\n", format, SDL_PIXELFORMAT_RGB888);
-    int width, height;
-    SDL_GetRendererOutputSize(G.renderer, &width, &height);
+    G.FONT_LOAD = SDL_RegisterEvents(1);
 
-    G.t = SDL_CreateTexture(G.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, width, height);
-    SDL_SetTextureBlendMode(G.t, SDL_BLENDMODE_BLEND);
-
-    G.LEVEL_LOAD = SDL_RegisterEvents(3);
-    G.FONT_LOAD = G.LEVEL_LOAD + 1;
-    G.AUDIO_LOAD = G.FONT_LOAD + 1;
-
-    // renderable_init_window(800, 600);
-
-    EM_ASM({
-        FS.mkdir('/data');
-        FS.mount(IDBFS, {}, '/data');
-        FS.syncfs(true, function(err){
-                            // handle callback
-                        });
-    });
-
-    // Test the state machine on 2 example fields
     G.gsm = gsm_new();
     // Temporary change
     gsm_set_state(&(G.gsm), Loading);

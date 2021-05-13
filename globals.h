@@ -15,13 +15,6 @@ enum {
 typedef struct Globals {
   SDL_Renderer *renderer;
   SDL_Texture *FontTexture;
-  SDL_Texture *t;
-  char keys[globals_key_count]; // RIGHT - LEFT - DOWN - UP, see
-                                // https://wiki.libsdl.org/SDLScancodeLookup
-  char previous_keys[globals_key_count];
-
-  Uint32 LEVEL_LOAD;
   Uint32 FONT_LOAD;
-  Uint32 AUDIO_LOAD;
   GameStateMachine gsm;
 } Globals;
